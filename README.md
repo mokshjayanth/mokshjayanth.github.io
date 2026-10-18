@@ -125,11 +125,10 @@ next decision.
 
 ## Type and shared patterns
 
-Spectral, self-hosted from `public/fonts` — three static weights at
-roughly 13KB each, so the whole family costs less than one variable
-font. A system stack would render as Iowan on a Mac, Georgia on
-Windows and Noto on Android; this way every reader sees what the page
-was designed against. The body weight is preloaded.
+System fonts — no webfont, nothing to download. The stack renders as
+Iowan Old Style on a Mac, Georgia on Windows, Noto on Android: all
+decent book faces, so the page varies a little by device rather than
+degrading.
 
 Serif throughout — body and headings share one face, so a page reads as
 a piece of writing rather than a document with a UI bolted on. Sans is

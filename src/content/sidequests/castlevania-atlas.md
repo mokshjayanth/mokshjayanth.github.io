@@ -7,6 +7,8 @@ finished: 2026-10-17
 status: done
 stack: ['JavaScript', 'D3 projections', 'Natural Earth', 'esbuild']
 links:
+  - label: Open the atlas
+    href: https://mokshjayanth.github.io/castlevania-atlas
   - label: Source
     href: https://github.com/mokshjayanth/castlevania-atlas
 draft: false

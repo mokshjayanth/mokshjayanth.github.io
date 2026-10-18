@@ -1,5 +1,3 @@
-@import './fonts.css';
-
 /* ---------------------------------------------------------------
    Design tokens.
    Deliberately neutral for now: the real palette and the site
@@ -21,7 +19,7 @@
      reads as a single piece of writing rather than a document with a
      UI bolted on. Sans is kept for small chrome — nav, meta, labels —
      where a serif at 13px would smear. */
-  --font-serif: 'Spectral', Iowan Old Style, Palatino, Georgia, serif;
+  --font-serif: Iowan Old Style, Palatino, Georgia, serif;
   --font-sans: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
