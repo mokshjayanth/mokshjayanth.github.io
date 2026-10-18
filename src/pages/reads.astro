@@ -1,0 +1,163 @@
+---
+import Base from '../layouts/Base.astro';
+import reads from '../data/reads.json';
+
+// Generated from the Goodreads RSS feed by scripts/fetch-reads.mjs and
+// committed, so a Goodreads outage cannot break a build.
+
+type Book = {
+  id: string;
+  title: string;
+  author: string;
+  link: string;
+  cover: string;
+  readAt: string | null;
+  addedAt: string | null;
+  review?: string;
+};
+
+type Shelf = { key: keyof typeof reads; heading: string; note?: string };
+
+const shelves: Shelf[] = [
+  { key: 'current', heading: 'Currently reading' },
+  { key: 'finished', heading: 'Read' },
+  { key: 'queue', heading: 'Reading list' },
+  { key: 'abandoned', heading: 'Put down', note: 'Started, not finished.' },
+];
+
+const data = reads as unknown as Record<string, Book[]> & { updated: string | null };
+
+const year = (iso: string | null) => (iso ? iso.slice(0, 4) : null);
+
+const updated = data.updated
+  ? new Date(data.updated).toLocaleDateString('en-GB', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  : null;
+---
+
+<Base title="Reads — Moving Parts" description="What I'm reading.">
+  <h1>Reads</h1>
+
+  <p class="lede">
+    I'm a Sunday reader. I don't get through many, and I only pick up
+    what genuinely piques my interest – hence this is a short shelf.
+  </p>
+
+  {shelves.map(({ key, heading, note }) => {
+    const books = (data[key] ?? []) as Book[];
+    if (books.length === 0) return null;
+    return (
+      <section>
+        <h2 class="section-heading">
+          {heading} <span class="count">{books.length}</span>
+        </h2>
+        {note && <p class="note">{note}</p>}
+        <ul class="books">
+          {books.map((book) => (
+            <li>
+              {book.cover && (
+                <img
+                  src={book.cover}
+                  alt=""
+                  width="48"
+                  height="72"
+                  loading="lazy"
+                  decoding="async"
+                />
+              )}
+              <div class="meta">
+                <a href={book.link} class="title">{book.title}</a>
+                <p class="byline">
+                  {book.author}
+                  {year(book.readAt) && <span class="year">{year(book.readAt)}</span>}
+                  {book.rating && (
+                    <span class="rating" title={`${book.rating} out of 5`}>
+                      {'★'.repeat(book.rating)}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  })}
+
+  {updated && <p class="updated">Synced from Goodreads on {updated}.</p>}
+
+  <style>
+    section {
+      margin-block-start: 3rem;
+    }
+
+    .count {
+      font-size: var(--step--1);
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .note {
+      margin-block: 0.6rem 0;
+      font-size: var(--step--1);
+      color: var(--text-muted);
+    }
+
+    .books {
+      list-style: none;
+      padding: 0;
+      margin-block-start: 1.5rem;
+      display: grid;
+      gap: 1.4rem;
+    }
+
+    .books li {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .books img {
+      width: 48px;
+      height: auto;
+      border-radius: 2px;
+      background: var(--bg-subtle);
+    }
+
+    .title {
+      font-weight: 600;
+      text-decoration: none;
+      text-wrap: balance;
+    }
+
+    .title:hover {
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+    }
+
+    .byline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0.2rem 0 0;
+      font-family: var(--font-sans);
+      font-size: var(--step--1);
+      color: var(--text-muted);
+    }
+
+    .year::before {
+      content: '· ';
+    }
+
+    .updated {
+      margin-block-start: 4rem;
+      font-family: var(--font-sans);
+      font-size: var(--step--1);
+      color: var(--text-muted);
+    }
+  </style>
+</Base>

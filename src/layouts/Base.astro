@@ -1,0 +1,177 @@
+---
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Backdrop from '../components/Backdrop.astro';
+import site from '../data/site.json';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** The landing page carries the identity; everything else stays calm. */
+  backdrop?: 'full' | 'quiet';
+}
+
+const {
+  title,
+  description = site.description,
+  backdrop = 'quiet',
+} = Astro.props;
+
+const nav = [
+  { href: '/', label: 'Front Matter' },
+  { href: '/essays', label: 'Essays' },
+  { href: '/reads', label: 'Reads' },
+  { href: '/sidequests', label: 'Side Quests' },
+];
+
+const here = Astro.url.pathname.replace(/\/$/, '');
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const isCurrent = (href: string) => here === `${base}${href}`.replace(/\/$/, '');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${site.title} — Essays`}
+      href={`${base}/rss.xml`}
+    />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <script is:inline>
+      // Set the theme before first paint to avoid a flash.
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') {
+          document.documentElement.setAttribute('data-theme', t);
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <Backdrop intensity={backdrop} />
+
+    <header>
+      <nav aria-label="Primary">
+        <ul>
+          {nav.map((item) => (
+            <li>
+              <a
+                href={`${base}${item.href}`}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <ThemeToggle />
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer>
+      <p class="colophon">
+        {site.title} — {site.author}
+      </p>
+      <ul class="link-row">
+        {site.links.map((link) => (
+          <li><a href={link.href} rel="me noopener">{link.label}</a></li>
+        ))}
+        <li><a href={`${base}/rss.xml`}>RSS</a></li>
+      </ul>
+    </footer>
+
+    <style>
+      .skip {
+        position: absolute;
+        left: -9999px;
+      }
+
+      .skip:focus {
+        left: 1rem;
+        top: 1rem;
+        background: var(--bg-subtle);
+        padding: 0.5rem 0.75rem;
+        z-index: 10;
+      }
+
+      header,
+      main,
+      footer {
+        max-width: var(--measure);
+        margin-inline: auto;
+        padding-inline: 1rem;
+      }
+
+      header {
+        display: flex;
+        gap: 0.75rem 1rem;
+        align-items: center;
+        justify-content: space-between;
+        padding-block: 1.75rem 3rem;
+      }
+
+      nav {
+        /* Let the nav shrink before the toggle does. */
+        min-inline-size: 0;
+      }
+
+      nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.1rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-family: var(--font-sans);
+        font-size: var(--step--1);
+      }
+
+      nav a {
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+
+      nav a:hover {
+        color: var(--text);
+      }
+
+      nav a[aria-current='page'] {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.5rem;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-block: 5rem 3rem;
+        padding-block-start: 1.5rem;
+        border-block-start: 1px solid var(--border);
+        color: var(--text-muted);
+        font-family: var(--font-sans);
+        font-size: var(--step--1);
+      }
+
+      .colophon {
+        margin: 0;
+      }
+
+
+    </style>
+  </body>
+</html>

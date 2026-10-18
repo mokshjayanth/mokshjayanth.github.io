@@ -1,16 +1,147 @@
-# mokshjayanth.github.io
+# Moving Parts
 
-My GitHub Portfolio Website.
+Personal site and blog. Astro, static output, deployed to GitHub Pages.
 
-Credits:
+## Running it
 
-	Demo Images:
-		Unsplash (unsplash.com)
+```sh
+nvm use        # Node 22.23.3, pinned in .nvmrc
+npm install
+npm run dev    # http://localhost:4321/
+npm run build  # -> dist/
+```
 
-	Icons:
-		Font Awesome (fontawesome.io)
+Astro 7 requires Node >= 22.22.0.
 
-	Other:
-		jQuery (jquery.com)
-		Scrollex (github.com/ajlkn/jquery.scrollex)
-		Responsive Tools (github.com/ajlkn/responsive-tools)
+## Sections
+
+| Route          | Source                        |
+| -------------- | ----------------------------- |
+| `/`            | `src/pages/index.astro`       |
+| `/essays`      | `src/content/essays/*.md`     |
+| `/reads`       | `src/data/reads.json`         |
+| `/sidequests`  | `src/content/sidequests/*.md` |
+
+## Writing
+
+Essays and side quests are Markdown with typed frontmatter — the schemas
+live in `src/content.config.ts` and the build fails if a field is missing
+or the wrong shape.
+
+An essay:
+
+```yaml
+---
+title: Physics and Computation
+description: One line, used on the index and in meta tags.
+date: 2026-10-18
+draft: true
+tags: []
+---
+```
+
+`draft: true` keeps a piece off the index and out of production builds.
+
+A side quest:
+
+```yaml
+---
+title: Castlevania Atlas
+description: Used in meta tags.
+blurb: One line, shown on the index.
+started: 2026-09-01
+finished: 2026-10-17     # omit while in progress
+status: done             # active | paused | done
+stack: ['JavaScript', 'esbuild']
+links:
+  - label: Source
+    href: https://github.com/...
+---
+```
+
+The index groups them: in-progress first, finished below.
+
+## Reads
+
+`src/data/reads.json` is generated from the Goodreads RSS feed and
+committed. Goodreads retired its API in 2020, but the per-user RSS feeds
+still work.
+
+```sh
+cp .env.example .env   # paste your feed URL
+npm run sync:reads
+```
+
+The feed URL carries a private key, so it lives in `.env` locally and in
+the `GOODREADS_RSS_URL` repository secret on CI — never in the repo.
+
+A `.env` file wants the value quoted; GitHub's secret field does not,
+and stores whatever is typed. The script trims stray quotes and
+whitespace and checks the URL parses before fetching, so a value pasted
+from one into the other still works and says so plainly if it cannot.
+
+CI re-syncs on every deploy and on a daily cron. If Goodreads is
+unreachable the script logs it, exits 0 and leaves the committed JSON in
+place, so an outage there cannot fail a deploy.
+
+Each shelf is fetched separately — `currently-reading`, `did-not-finish`,
+`to-read`, `read` — and a book is filed under the first it appears on.
+A final `#ALL#` pass catches anything on no status shelf, which
+Goodreads treats as read.
+
+This is deliberate. The `#ALL#` feed's `user_shelves` field goes stale:
+move a book to currently-reading and its own shelf feed updates at
+once, while `#ALL#` keeps reporting the old shelves for some time. The
+per-shelf feeds are the source of truth.
+
+If a book lands in the wrong place, fix its shelves on Goodreads and
+re-sync.
+
+## Feed
+
+`/rss.xml` carries published essays only — side quests are edited as the
+work goes on, and a feed that re-fires on every tweak is a nuisance.
+Autodiscovery is declared in the base layout, so readers find it from
+any page.
+
+## Links
+
+Name, description and the Elsewhere links live in `src/data/site.json`
+and are used by the home page, the footer and the feed. Edit them in
+that one place.
+
+## Theme
+
+Light and dark, toggled in the header, defaulting to the system setting
+and remembered in `localStorage`. There is no Auto control: Auto is what
+a visitor gets until they choose otherwise, and a tap is a deliberate
+choice. Clearing the stored value means clearing site data. Every colour is a custom property in
+`src/styles/global.css` — defined on `:root`, redefined under
+`prefers-color-scheme: dark` and again under `:root[data-theme='dark']`.
+Changing the palette means editing that one block.
+
+The visual design is deliberately plain for now. The background is the
+next decision.
+
+## Type and shared patterns
+
+Serif throughout — body and headings share one face, so a page reads as
+a piece of writing rather than a document with a UI bolted on. Sans is
+kept for small chrome (nav, meta, labels), where a serif at 13px
+smears.
+
+Three patterns live in `global.css` rather than in each page, so they
+cannot drift apart: `.section-heading` (the ruled heading on Reads and
+Side Quests), `.lede` (the opening line under a page title), and
+`.link-row` (Elsewhere and the footer — navigation, so underlines
+appear on hover only).
+
+## Deploying
+
+`.github/workflows/deploy.yml` builds and publishes on push to `main`.
+It needs Pages enabled on the repo with source set to GitHub Actions.
+
+The site is configured for a project site at
+`mokshjayanth.github.io` as a user site, so there is no `base` path.
+Attaching a custom domain later means adding a `CNAME` file and DNS
+records; nothing in the build changes.

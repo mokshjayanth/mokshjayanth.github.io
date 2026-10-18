@@ -1,0 +1,182 @@
+/* ---------------------------------------------------------------
+   Design tokens.
+   Deliberately neutral for now: the real palette and the site
+   background are the next design decision. Every colour lives
+   here so that swapping it is a change to this block alone.
+---------------------------------------------------------------- */
+
+:root {
+  --bg: #faf9f6;
+  --bg-subtle: #f1efea;
+  --text: #1c1b19;
+  --text-muted: #6b665e;
+  --border: #ddd9d0;
+  --accent: #2d5a7b;
+  --sun: #9c6f1f;
+  --moon: #6b7b8c;
+
+  /* Serif throughout: body and headings share one face, so the page
+     reads as a single piece of writing rather than a document with a
+     UI bolted on. Sans is kept for small chrome — nav, meta, labels —
+     where a serif at 13px would smear. */
+  --font-serif: Iowan Old Style, Palatino, Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --font-body: var(--font-serif);
+  --font-display: var(--font-serif);
+
+  --measure: 34rem;
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.09rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.1rem);
+  --step-3: clamp(1.9rem, 1.5rem + 1.8vw, 2.9rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #14161a;
+    --bg-subtle: #1c1f24;
+    --text: #e6e4df;
+    --text-muted: #9a978f;
+    --border: #2b2f36;
+    --accent: #7fb3d5;
+    --sun: #d9a441;
+    --moon: #9fb3c8;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #14161a;
+  --bg-subtle: #1c1f24;
+  --text: #e6e4df;
+  --text-muted: #9a978f;
+  --border: #2b2f36;
+  --accent: #7fb3d5;
+  --sun: #d9a441;
+  --moon: #9fb3c8;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+h1 { font-size: var(--step-3); }
+h2 { font-size: var(--step-2); }
+h3 { font-size: var(--step-1); }
+
+a {
+  color: inherit;
+  text-decoration-color: var(--border);
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-color: var(--accent);
+}
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+pre {
+  padding: 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------
+   Shared patterns. Defined once so pages cannot drift apart.
+---------------------------------------------------------------- */
+
+/* A section rule, as used on Reads and Side Quests. */
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: var(--step-1);
+  padding-block-end: 0.4rem;
+  border-block-end: 1px solid var(--border);
+}
+
+/* The opening line under a page title. */
+.lede {
+  color: var(--text-muted);
+  text-wrap: pretty;
+  max-width: 30rem;
+}
+
+/* Lists of destinations — Elsewhere, the footer. Navigation, not
+   prose, so no underline until hover. */
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+}
+
+.link-row a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.link-row a:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+}
