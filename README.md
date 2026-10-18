@@ -125,6 +125,12 @@ next decision.
 
 ## Type and shared patterns
 
+Spectral, self-hosted from `public/fonts` — three static weights at
+roughly 13KB each, so the whole family costs less than one variable
+font. A system stack would render as Iowan on a Mac, Georgia on
+Windows and Noto on Android; this way every reader sees what the page
+was designed against. The body weight is preloaded.
+
 Serif throughout — body and headings share one face, so a page reads as
 a piece of writing rather than a document with a UI bolted on. Sans is
 kept for small chrome (nav, meta, labels), where a serif at 13px
