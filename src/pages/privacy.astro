@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import site from '../data/site.json';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Base
+  title={`${site.title} — Privacy`}
+  description="What this site does and does not collect."
+>
+  <h1>Privacy</h1>
+
+  <p class="lede">
+    Short version: no cookies, no accounts, no tracking. Visits are counted, and that is all.
+  </p>
+
+  <h2>What is collected</h2>
+  <p>
+    This site counts visits with <a href="https://www.cloudflare.com/web-analytics/" rel="noopener">Cloudflare
+    Web Analytics</a>. It is cookieless and uses no fingerprinting or cross-site identifiers. It records that a page was
+    viewed, along with the referring site, country, browser and device type.
+  </p>
+  <p>
+    It does not record who you are. Nothing it collects can be traced back to you or followed across
+    other sites, and there is no profile of you anywhere in it.
+  </p>
+
+  <h2>What is not collected</h2>
+  <p>
+    No cookies are set. There is no advertising, no third-party tracker and nothing sold or shared.
+    Your chosen theme is remembered in your own browser's local storage, never transmitted anywhere,
+    and removed when you clear your site data.
+  </p>
+
+  <h2>What is hosted elsewhere</h2>
+  <p>
+    The site is served by GitHub Pages, which keeps its own server logs. Book covers on
+    the <a href={`${base}/reads`}>Reads</a> page are loaded from Goodreads, so your browser requests them from
+    Goodreads directly.
+  </p>
+
+  <h2>Questions</h2>
+  <p>
+    If something here is unclear, or you would like to ask about anything on this
+    page, <a href={site.links.find((l) => l.label === 'Email')?.href} rel="noopener">get in touch</a>.
+  </p>
+</Base>

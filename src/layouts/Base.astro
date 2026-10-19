@@ -105,6 +105,7 @@ const isCurrent = (href: string) => here === `${base}${href}`.replace(/\/$/, '')
           <li><a href={link.href} rel="me noopener">{link.label}</a></li>
         ))}
         <li><a href={`${base}/rss.xml`}>RSS</a></li>
+        <li><a href={`${base}/privacy`}>Privacy</a></li>
       </ul>
     </footer>
 
@@ -188,5 +189,13 @@ const isCurrent = (href: string) => here === `${base}${href}`.replace(/\/$/, '')
 
 
     </style>
+
+    <!-- Cloudflare Web Analytics: cookieless, no personal data, no cross-site identifiers.
+         Counts pageviews, referrer, country and device type. See /privacy. -->
+    <script
+      type="module"
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "54795d2cc92943c69563af3344b98ded"}'
+    ></script>
   </body>
 </html>
