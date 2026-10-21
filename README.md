@@ -146,7 +146,7 @@ appear on hover only).
 `.github/workflows/deploy.yml` builds and publishes on push to `main`.
 It needs Pages enabled on the repo with source set to GitHub Actions.
 
-The site is configured for a project site at
-`mokshjayanth.github.io` as a user site, so there is no `base` path.
+The site is served from `mokshjayanth.github.io` as a user site, so
+there is no `base` path.
 Attaching a custom domain later means adding a `CNAME` file and DNS
 records; nothing in the build changes.

@@ -73,11 +73,6 @@ const updated = data.updated
                 <p class="byline">
                   {book.author}
                   {year(book.readAt) && <span class="year">{year(book.readAt)}</span>}
-                  {book.rating && (
-                    <span class="rating" title={`${book.rating} out of 5`}>
-                      {'★'.repeat(book.rating)}
-                    </span>
-                  )}
                 </p>
               </div>
             </li>
