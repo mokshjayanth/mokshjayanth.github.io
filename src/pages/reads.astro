@@ -57,7 +57,7 @@ const updated = data.updated
         {note && <p class="note">{note}</p>}
         <ul class="books">
           {books.map((book) => (
-            <li>
+            <li id={`book-${book.id}`}>
               {book.cover && (
                 <img
                   src={book.cover}
@@ -69,7 +69,7 @@ const updated = data.updated
                 />
               )}
               <div class="meta">
-                <a href={book.link} class="title">{book.title}</a>
+                <a href={book.link} class="title" target="_blank" rel="noopener">{book.title}</a>
                 <p class="byline">
                   {book.author}
                   {year(book.readAt) && <span class="year">{year(book.readAt)}</span>}
@@ -114,6 +114,59 @@ const updated = data.updated
       grid-template-columns: 48px 1fr;
       gap: 1rem;
       align-items: start;
+    }
+
+    /* Arriving from the front page's "Reading" link: land the book a
+       third of the way down rather than flush against the top, and
+       mark it briefly so the eye finds it, then let it settle back.
+       The wash uses the same neutral as the theme toggle's hover and
+       the underline the accent every link hover uses, so both follow
+       the mode. The wash is a box-shadow so it pads the row without
+       moving anything. */
+    .books li {
+      scroll-margin-block-start: 30vh;
+      border-radius: 4px;
+    }
+
+    .books li:target {
+      animation: found-row 2.4s ease-out;
+    }
+
+    .books li:target .title {
+      animation: found-title 2.4s ease-out;
+    }
+
+    @keyframes found-row {
+      from,
+      30% {
+        background: color-mix(in srgb, var(--text) 7%, transparent);
+        box-shadow: 0 0 0 0.6rem color-mix(in srgb, var(--text) 7%, transparent);
+      }
+    }
+
+    @keyframes found-title {
+      from,
+      30% {
+        text-decoration-line: underline;
+        text-decoration-color: var(--accent);
+      }
+      to {
+        text-decoration-line: underline;
+        text-decoration-color: transparent;
+      }
+    }
+
+    /* No fade without motion: a plain underline that stays put. */
+    @media (prefers-reduced-motion: reduce) {
+      .books li:target,
+      .books li:target .title {
+        animation: none;
+      }
+
+      .books li:target .title {
+        text-decoration: underline;
+        text-decoration-color: var(--accent);
+      }
     }
 
     .books img {

@@ -11,9 +11,11 @@
   --text: #1c1b19;
   --text-muted: #6b665e;
   --border: #ddd9d0;
-  --accent: #2d5a7b;
-  --sun: #9c6f1f;
+  --sun: #8a6119;
   --moon: #6b7b8c;
+  /* The accent is whichever glyph the toggle shows: sun by day, moon
+     by night, so links and the toggle read as one colour per mode. */
+  --accent: var(--sun);
 
   /* Serif throughout: body and headings share one face, so the page
      reads as a single piece of writing rather than a document with a
@@ -41,9 +43,9 @@
     --text: #e6e4df;
     --text-muted: #9a978f;
     --border: #2b2f36;
-    --accent: #7fb3d5;
     --sun: #d9a441;
     --moon: #9fb3c8;
+    --accent: var(--moon);
   }
 }
 
@@ -53,9 +55,9 @@
   --text: #e6e4df;
   --text-muted: #9a978f;
   --border: #2b2f36;
-  --accent: #7fb3d5;
   --sun: #d9a441;
   --moon: #9fb3c8;
+  --accent: var(--moon);
 }
 
 *,

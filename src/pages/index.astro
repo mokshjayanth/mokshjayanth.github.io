@@ -1,6 +1,27 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import site from '../data/site.json';
+import reads from '../data/reads.json';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// A small "now" block, built from what is already on the site so it
+// never needs updating by hand. One item per row, each linking to its
+// place on this site. Rows with nothing in them are dropped.
+const [book] = reads.current; // already newest-added first
+const [quest] = (
+  await getCollection('sidequests', ({ data }) => !data.draft && data.status === 'active')
+).sort((a, b) => b.data.started.valueOf() - a.data.started.valueOf());
+
+const [latest] = (await getCollection('essays', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const now = [
+  book && { label: 'Reading', title: book.title, href: `${base}/reads#book-${book.id}` },
+  quest && { label: 'Side quest', title: quest.data.title, href: `${base}/sidequests/${quest.id}` },
+  latest && { label: 'Latest essay', title: latest.data.title, href: `${base}/essays/${latest.id}` },
+].filter((row) => !!row);
 ---
 
 <Base title="Moving Parts" backdrop="full">
@@ -14,12 +35,16 @@ import site from '../data/site.json';
     to understand what makes them go, and writing up what I find.
   </p>
 
-  <h2 class="section-heading">Elsewhere</h2>
-  <ul class="link-row">
-    {site.links.map((link) => (
-      <li><a href={link.href} rel="me noopener">{link.label}</a></li>
-    ))}
-  </ul>
+  {now.length > 0 && (
+    <dl class="now">
+      {now.map(({ label, title, href }) => (
+        <div>
+          <dt>{label}</dt>
+          <dd><a href={href}>{title}</a></dd>
+        </div>
+      ))}
+    </dl>
+  )}
 
   <style>
     .lede {
@@ -27,8 +52,35 @@ import site from '../data/site.json';
       line-height: 1.5;
     }
 
-    .link-row {
-      margin-block-start: 1rem;
+    .now {
+      display: grid;
+      gap: 0.4rem;
+      margin: 2.5rem 0 0;
+      font-family: var(--font-sans);
+      font-size: var(--step--1);
+    }
+
+    .now > div {
+      display: grid;
+      grid-template-columns: 6.5rem 1fr;
+      gap: 0.75rem;
+    }
+
+    .now dt {
+      color: var(--text-muted);
+    }
+
+    .now dd {
+      margin: 0;
+    }
+
+    .now a {
+      text-decoration: none;
+    }
+
+    .now a:hover {
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
     }
   </style>
 </Base>
