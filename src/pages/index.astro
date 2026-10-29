@@ -30,9 +30,32 @@ const now = [
   <p class="lede">Field notes from taking things apart.</p>
 
   <p>
-    <!-- Replace this with your actual bio. -->
-    I'm Moksh. I'm interested in the physics of things: taking systems apart
-    to understand what makes them go, and writing up what I find.
+    Over the coming decade, as AI gets more capable, I believe we’ll have solutions faster than we can put them to
+    good use. <strong>The hard part shifts from finding solutions to applying them gracefully.</strong>
+  </p>
+
+  <p>
+    What I want to understand is how. At minimum, that takes three things:
+  </p>
+
+  <ul class="three">
+    <li><span class="label">What’s right:</span> AI safety, alignment and policies </li>
+    <li>
+      <span class="label">What’s feasible:</span> guardrails, grounded in computational
+      complexity, for choosing and building solutions at scale
+    </li>
+    <li><span class="label">What’s supportable:</span> the physical infrastructure to run them</li>
+  </ul>
+
+  <p>
+    I’m Moksh, a software engineer based in Bengaluru, India. I take systems
+    apart to understand them.
+  </p>
+
+  <p>
+    This site is where I work through these ideas in the open. Start with
+    the <a href={`${base}/essays`}>essays</a>, or see what I’m building
+    under <a href={`${base}/sidequests`}>Side Quests</a>.
   </p>
 
   {now.length > 0 && (
@@ -50,6 +73,18 @@ const now = [
     .lede {
       font-size: var(--step-1);
       line-height: 1.5;
+    }
+
+    .three {
+      padding-inline-start: 1.1rem;
+    }
+
+    .three li {
+      margin-block: 0.4rem;
+    }
+
+    .three .label {
+      font-style: italic;
     }
 
     .now {
