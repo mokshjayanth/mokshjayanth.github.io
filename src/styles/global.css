@@ -16,6 +16,10 @@
   /* The accent is whichever glyph the toggle shows: sun by day, moon
      by night, so links and the toggle read as one colour per mode. */
   --accent: var(--sun);
+  /* Selected text: a tint of the accent, mixed into the ground. Dark
+     mode takes a stronger mix, since the moon is muted enough to read
+     as plain grey at the lighter one. */
+  --selection: color-mix(in srgb, var(--accent) 30%, var(--bg));
 
   /* Serif throughout: body and headings share one face, so the page
      reads as a single piece of writing rather than a document with a
@@ -46,6 +50,7 @@
     --sun: #d9a441;
     --moon: #9fb3c8;
     --accent: var(--moon);
+    --selection: color-mix(in srgb, var(--accent) 40%, var(--bg));
   }
 }
 
@@ -58,6 +63,7 @@
   --sun: #d9a441;
   --moon: #9fb3c8;
   --accent: var(--moon);
+  --selection: color-mix(in srgb, var(--accent) 40%, var(--bg));
 }
 
 *,
@@ -111,6 +117,13 @@ pre {
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 4px;
+}
+
+/* Mixed into the page ground rather than made translucent, so every
+   browser shows the same colour. */
+::selection {
+  background-color: var(--selection);
+  color: var(--text);
 }
 
 :focus-visible {
