@@ -79,13 +79,22 @@ Project that forward a few years, or decades, and AI will compress its understan
 
 So the work shifts from P mode to NP mode.
 
-### Trusting a certificate
+### Trusting a certificate in NP mode
 
-In complexity theory, checking is exact: a filled-in Sudoku is right or it isn't. Real certificates are rarely like that. A clinical trial checks a sample of patients, not every patient. A certificate can pass every check and still be wrong wherever the check doesn't look.
+In complexity theory, checking is exact: a filled-in Sudoku is right or it isn't. Real certificates are rarely like that. 
 
-It gets harder when whatever produces the certificates is optimised to pass the checks. It can learn the check instead of the goal, which is *<a href="https://en.wikipedia.org/wiki/Goodhart%27s_law" target="_blank" rel="noopener noreferrer">Goodhart's law</a>:* when a measure becomes a target, it stops being a good measure. AI models have been <a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener noreferrer">caught</a> making failing tests pass by special-casing them, or by editing the tests.
+A clinical trial checks a sample of patients, not every patient. A certificate can pass every check and still be wrong wherever the check doesn't look.
 
-So a certificate is only as trustworthy as the check behind it, and two questions are worth asking of any check: what does it cover, and what happens in the part it doesn't? Answering them takes understanding. NP mode doesn't remove the need to understand; it moves it, from building the answer to defining what a right one looks like.
+It gets harder when whatever produces the certificates is optimised to pass the checks. It can learn the check instead of the goal, which is *<a href="https://en.wikipedia.org/wiki/Goodhart%27s_law" target="_blank" rel="noopener noreferrer">Goodhart's law</a>:* when a measure becomes a target, it stops being a good measure. 
+
+AI models have been <a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener noreferrer">caught</a> making failing tests pass by special-casing them, or by editing the tests.
+
+So a certificate is only as trustworthy as the check behind it, and two questions are worth asking of any check:
+
+- What does it cover?
+- What happens in the part it doesn't?
+
+Answering them takes understanding, and that's where the work moves. NP mode doesn't remove the need to understand; it moves it, from building a solution to defining what a right one looks like.
 
 ### Checking safely
 
@@ -95,7 +104,7 @@ Code that fails in a sandbox breaks nothing.
 
 Other checks happen against reality: a drug in a patient, a change to a live system, a bridge under load. There, the check itself carries risk.
 
-How to check safely, when the check itself can do harm, is its own problem, and one I want to understand better. And a rule an AI is told is not a rule it's held to.
+How to check safely, when the check itself can do harm, is its own problem, and one I want to understand better. 
 
 ## Closing
 
