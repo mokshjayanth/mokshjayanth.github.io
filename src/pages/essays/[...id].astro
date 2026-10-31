@@ -62,9 +62,36 @@ const fmt = (d: Date) =>
     }
 
     .prose :global(blockquote) {
-      margin-inline: 0;
+      margin: 1.5rem 0;
       padding-inline-start: 1rem;
-      border-inline-start: 2px solid var(--border);
+      border-inline-start: 2px solid var(--accent);
+      font-style: italic;
+    }
+
+    .prose :global(ul) {
+      padding-inline-start: 1.1rem;
+    }
+
+    .prose :global(li) {
+      margin-block: 0.4rem;
+    }
+
+    .prose :global(figure.sketch) {
+      margin: 2rem 0;
+      text-align: center;
+    }
+
+    .prose :global(figure.sketch svg) {
+      display: block;
+      margin-inline: auto;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .prose :global(figcaption) {
+      margin-block-start: 0.5rem;
+      font-family: var(--font-sans);
+      font-size: var(--step--1);
       color: var(--text-muted);
     }
 

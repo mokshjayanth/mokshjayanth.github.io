@@ -1,0 +1,104 @@
+---
+title: P vs NP
+description: What a decades-old unsolved problem in computer science says about the future of work and AI.
+draft: false
+date: 2026-11-01
+tags: []
+---
+import OneStrokeHouse from '../../assets/essays/one-stroke-house.svg';
+
+On 24 May 2000, at the Collège de France in Paris, the Clay Mathematics Institute named seven unsolved problems and offered $1 million for each.
+They're known as the <a href="https://www.claymath.org/millennium-problems/" target="_blank" rel="noopener noreferrer">Millennium Prize Problems</a>,
+and one of them is P vs NP.
+
+It's usually treated as a question for mathematicians, but it's also a useful way to think about work. Some work is finding a solution: call it P mode. Some is checking one: call it NP mode. As AI takes on more of the finding, more of our work moves into checking.
+
+To see why, we first need a working sense of what P vs NP means.
+
+## What P vs NP means
+
+<a href="https://www.claymath.org/millennium/p-vs-np/" target="_blank" rel="noopener noreferrer">The Clay Mathematics Institute</a> puts it like this:
+
+> If it is easy to check that a solution to a problem is correct, is it
+> also easy to solve the problem? This is the essence of the P vs NP question.
+
+Two puzzles show the difference.
+
+### Tracing a shape in one stroke
+
+<figure class="sketch">
+  <OneStrokeHouse role="img" aria-label="A house shape: a square with both diagonals and a triangular roof." />
+  <figcaption>Can this be drawn in one stroke?</figcaption>
+</figure>
+
+You've probably seen this puzzle: a house with a cross through it, and the challenge is to trace every line exactly once without lifting the pencil.
+It's a yes-or-no question (*can this shape be drawn in one stroke?*), and yes-or-no questions are what computer scientists call *decision problems*.
+
+Trial and error seems like the only way, but there's a shortcut. Count the corners where an odd number of lines meet. If there are none, or exactly two, the shape can be drawn in one stroke, as long as all its lines are connected. Otherwise it can't.
+
+The count visits each corner once, so a drawing twice as big takes about twice the work. The effort grows steadily, never explosively, and that is what *polynomial time* means. Problems we can solve this efficiently belong to **P**.
+
+### Solving a Sudoku
+
+Sudoku is different. Nobody knows a shortcut for solving it. Every known method comes down to <a href="https://en.wikipedia.org/wiki/Sudoku_solving_algorithms" target="_blank" rel="noopener noreferrer">trying possibilities</a>, and as the grid grows (16×16, 25×25 and beyond) the number of possibilities explodes.
+
+Checking a filled-in grid is easy, though: every row, column and box must contain each number exactly once. That check grows steadily with the grid.
+
+That's what defines **NP**: if someone hands you an answer, you can check it efficiently. It says nothing about finding the answer. Every problem in P is also in NP, since anything you can solve quickly you can check quickly. 
+
+The open question runs the other way: *is every problem that's easy to check also easy to solve?* Most researchers believe not, but nobody has proved it.
+
+### The formal definitions
+
+- **P** = \{ decision problems solvable by a deterministic algorithm in
+  polynomial time, O(nᵏ) for some constant k \}
+- **NP** = \{ decision problems where every yes-instance has a certificate
+  of polynomial size that can be verified in polynomial time \}
+
+In the one-stroke puzzle, n is the number of corners and lines, and the count takes O(n) time, so k = 1. In Sudoku, a yes-instance is a puzzle that has a solution, the certificate is the filled-in grid, and checking it takes polynomial time.
+
+## The two work modes
+
+P and NP are classes of problems, but they also work as a lens on work itself: does the work need you to find a solution, or to check one?
+
+**P mode:** you produce the solution, and that takes understanding how the system works. A structural engineer calculates the loads on a bridge from the physics of steel and concrete before anything is built. A programmer writes a routine from knowing how the algorithm works.
+
+**NP mode:** you're handed a candidate. In complexity theory, it's called a *certificate*, and your job is to check it. That takes a different kind of understanding: not how to find the answer, but what a right answer looks like. Checking a Sudoku needs the rules, not an algorithm.
+
+Until now, NP mode had a cost: someone still had to produce the candidates, and without understanding, that meant guessing. 
+
+Edison's team tested thousands of materials before finding a filament that lasted. Drug companies still screen millions of compounds to find a few worth a trial. It works, but it's slow and expensive, so most load-bearing work has been done in P mode.
+
+And I don't think that will hold for much longer.
+
+## AI and the future of work
+
+AI is making candidates cheap. A model drafts working code in seconds, and the developer's job becomes reviewing it. <a href="https://deepmind.google/science/alphafold/" target="_blank" rel="noopener noreferrer">AlphaFold</a> predicts a protein's structure in minutes, where working it out in a lab can take months or years, and the lab's job becomes confirming the predictions that matter.
+
+Project that forward a few years, or decades, and AI will compress its understanding of a system into candidates we can test directly against reality. Producing certificates, the costly half of NP mode, gets cheap. Checking them doesn't. 
+
+So the work shifts from P mode to NP mode.
+
+### Trusting a certificate
+
+In complexity theory, checking is exact: a filled-in Sudoku is right or it isn't. Real certificates are rarely like that. A clinical trial checks a sample of patients, not every patient. A certificate can pass every check and still be wrong wherever the check doesn't look.
+
+It gets harder when whatever produces the certificates is optimised to pass the checks. It can learn the check instead of the goal, which is *<a href="https://en.wikipedia.org/wiki/Goodhart%27s_law" target="_blank" rel="noopener noreferrer">Goodhart's law</a>:* when a measure becomes a target, it stops being a good measure. AI models have been <a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener noreferrer">caught</a> making failing tests pass by special-casing them, or by editing the tests.
+
+So a certificate is only as trustworthy as the check behind it, and two questions are worth asking of any check: what does it cover, and what happens in the part it doesn't? Answering them takes understanding. NP mode doesn't remove the need to understand; it moves it, from building the answer to defining what a right one looks like.
+
+### Checking safely
+
+Some checks cost nothing. A proof can be checked line by line by software like <a href="https://lean-lang.org/" target="_blank" rel="noopener noreferrer">Lean</a>; in 2024, DeepMind's <a href="https://deepmind.google/blog/ai-solves-imo-problems-at-silver-medal-level/" target="_blank" rel="noopener noreferrer">AlphaProof reached silver-medal standard</a> at the International Mathematical Olympiad with proofs checked that way.
+
+Code that fails in a sandbox breaks nothing.
+
+Other checks happen against reality: a drug in a patient, a change to a live system, a bridge under load. There, the check itself carries risk.
+
+How to check safely, when the check itself can do harm, is its own problem, and one I want to understand better. And a rule an AI is told is not a rule it's held to.
+
+## Closing
+
+P vs NP asks whether easy to check means easy to solve, and nobody knows.
+
+At work, AI is settling a practical version of it: solutions are getting cheap, whether or not they're easy. What stays scarce is the checking: knowing what right looks like, building checks worth trusting, and running them where being wrong is affordable. That's where I think the hard work moves next.

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" width="200" height="230" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" />
+      <feDisplacementMap in="SourceGraphic" scale="2.2" />
+    </filter>
+  </defs>
+  <g filter="url(#ink)" stroke-width="2.6">
+    <path d="M37 206 Q100 208.5 163 204.5" />
+    <path d="M40.5 208 Q38 150 41 92" />
+    <path d="M159 207 Q162.5 151 159.5 92.5" />
+    <path d="M37.5 94.5 Q100 91 162 95" />
+    <path d="M41 204 Q97 153 158.5 96" />
+    <path d="M159.5 203.5 Q103 146 42 95.5" />
+    <path d="M39 95 Q68 61 100.5 31" />
+    <path d="M99 33 Q132 64 161 94" />
+  </g>
+  <g filter="url(#ink)" stroke-width="1" opacity="0.45">
+    <path d="M42 205 Q101 206.5 160 203" />
+    <path d="M42.5 150 Q40 120 42.5 96" />
+    <path d="M61 69 Q80 50 99 33.5" />
+  </g>
+</svg>

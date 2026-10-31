@@ -18,3 +18,9 @@ fixed in `.github/workflows/deploy.yml`.
   the next few runs.
 
 Push, and check the annotations are gone.
+
+## Link the policy-adherence preprint from the P vs NP essay
+
+Once the SRE agent policy-adherence preprint is out, link it from the
+essay's "a rule an AI is told is not a rule it's held to" line, and
+publish its side quest entry (parked as a draft) with the preprint link.
