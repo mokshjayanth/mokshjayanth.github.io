@@ -48,7 +48,13 @@ const when =
             <dt>Links</dt>
             <dd>
               {links.map((link) => (
-                <a href={link.href} rel="noopener">{link.label}</a>
+                <a
+                  href={link.href}
+                  rel="noopener"
+                  target={link.newTab ? '_blank' : undefined}
+                >
+                  {link.label}
+                </a>
               ))}
             </dd>
           </div>

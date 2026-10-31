@@ -56,6 +56,7 @@ stack: ['JavaScript', 'esbuild']
 links:
   - label: Source
     href: https://github.com/...
+    newTab: true         # optional; opens in a new tab
 ---
 ```
 
@@ -125,10 +126,25 @@ next decision.
 
 ## Type and shared patterns
 
-System fonts — no webfont, nothing to download. The stack renders as
-Iowan Old Style on a Mac, Georgia on Windows, Noto on Android: all
-decent book faces, so the page varies a little by device rather than
-degrading.
+The serif is [Newsreader](https://github.com/productiontype/Newsreader),
+self-hosted from `public/fonts/` under the OFL (`public/fonts/OFL.txt`):
+one variable file for roman and one for italic, each carrying weight
+and optical-size axes, so headings and body each get the cut drawn for
+their size. Nothing is fetched from a third party, so the privacy page
+needs no mention of it. The roman file is preloaded; the italic loads
+only on pages that use it.
+
+While it loads, the page shows Georgia scaled to Newsreader's metrics
+(the `Newsreader Fallback` face in `global.css`), so text does not jump
+when the real face swaps in. The overrides were computed from both
+fonts' metric tables; recompute them if the font file is ever replaced.
+
+Weights are tokens — `--weight-body`, `--weight-heading`,
+`--weight-strong` — eased slightly in dark mode, where light text on a
+dark ground reads heavier than it is.
+
+Spectral (`101299c`) and Libron were tried along the way; Libron was
+too dense on a phone.
 
 Serif throughout — body and headings share one face, so a page reads as
 a piece of writing rather than a document with a UI bolted on. Sans is

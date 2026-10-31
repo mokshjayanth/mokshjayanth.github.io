@@ -34,6 +34,12 @@ const canonical = new URL(
   Astro.site ?? 'https://mokshjayanth.github.io'
 ).href;
 const isCurrent = (href: string) => here === `${base}${href}`.replace(/\/$/, '');
+
+// From the year Moving Parts began to the year of the build. The site
+// rebuilds daily, so the range keeps itself current.
+const since = 2026;
+const now = new Date().getFullYear();
+const years = now > since ? `${since}–${now}` : `${since}`;
 ---
 
 <!doctype html>
@@ -42,6 +48,13 @@ const isCurrent = (href: string) => here === `${base}${href}`.replace(/\/$/, '')
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    <link
+      rel="preload"
+      href={`${base}/fonts/newsreader.woff2`}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
     <link rel="icon" href={`${base}/favicon.ico`} sizes="32x32" />
     <link
@@ -98,7 +111,7 @@ const isCurrent = (href: string) => here === `${base}${href}`.replace(/\/$/, '')
 
     <footer>
       <p class="colophon">
-        {site.title} — {site.author}
+        {site.title} — {site.author} · © {years}
       </p>
       <ul class="link-row">
         {site.links.map((link) => (

@@ -18,12 +18,3 @@ fixed in `.github/workflows/deploy.yml`.
   the next few runs.
 
 Push, and check the annotations are gone.
-
-## Revisit the type
-
-A pencil-themed design is the idea. Spectral was tried and reverted
-(`eb4170b`) in favour of system fonts: nothing to download, a decent
-book face on every device. Name what the current type gets wrong before
-choosing a replacement. Any webfont should be self-hosted — a request to
-Google Fonts would add a third party the privacy page would have to
-mention.

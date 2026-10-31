@@ -25,7 +25,14 @@ const sidequests = defineCollection({
     /** Tools, languages, instruments — whatever the quest is made of. */
     stack: z.array(z.string()).default([]),
     links: z
-      .array(z.object({ label: z.string(), href: z.string().url() }))
+      .array(
+        z.object({
+          label: z.string(),
+          href: z.string().url(),
+          /** Open in a new tab — for things worth exploring and returning from. */
+          newTab: z.boolean().default(false),
+        })
+      )
       .default([]),
     draft: z.boolean().default(false),
   }),
