@@ -19,7 +19,7 @@ const [latest] = (await getCollection('essays', ({ data }) => !data.draft)).sort
 
 const now = [
   book && { label: 'Reading', title: book.title, href: `${base}/reads#book-${book.id}` },
-  quest && { label: 'Side quest', title: quest.data.title, href: `${base}/sidequests/${quest.id}` },
+  quest && { label: 'Working on', title: quest.data.title, href: `${base}/sidequests/${quest.id}` },
   latest && { label: 'Latest essay', title: latest.data.title, href: `${base}/essays/${latest.id}` },
 ].filter((row) => !!row);
 ---

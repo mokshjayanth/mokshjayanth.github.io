@@ -33,8 +33,6 @@ jobs:
       # Falls back to the committed src/data/reads.json if Goodreads
       # is unreachable, so an outage there cannot fail the deploy.
       - name: Sync reads from Goodreads
-        env:
-          GOODREADS_RSS_URL: ${{ secrets.GOODREADS_RSS_URL }}
         run: node scripts/fetch-reads.mjs
 
       - run: npm run build

@@ -1,13 +1,11 @@
 /**
- * Fetches the Goodreads RSS shelf and writes src/data/reads.json.
+ * Reads the public Goodreads shelf widget and writes src/data/reads.json.
  *
- * Goodreads retired its API in 2020 but the per-user RSS feeds still
- * work. The feed URL carries a personal key, so it lives in the
- * environment rather than in the repo:
+ * Goodreads retired its API in 2020 and its RSS feeds in October 2026.
+ * The custom shelf widget, the one it offers for embedding on other
+ * sites, is what's left. It needs no key, only the public user ID.
  *
- *   GOODREADS_RSS_URL=... node scripts/fetch-reads.mjs
- *
- * The written file is committed. If a later run cannot reach Goodreads
+ * The written file is committed. If a later run cannot read Goodreads
  * the build simply keeps using the committed copy, so an outage there
  * never breaks a deploy.
  */
@@ -17,22 +15,20 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const OUT = fileURLToPath(new URL('../src/data/reads.json', import.meta.url));
-const PER_PAGE = 100;
-const MAX_PAGES = 20;
+const USER_ID = '163529641';
+const MAX_BOOKS = 100;
 
-// Trim whitespace and any stray surrounding quotes: a .env file needs
-// them, GitHub's secret field does not, and pasting one into the other
-// is an easy way to store a URL that cannot be parsed.
-const feedUrl = (process.env.GOODREADS_RSS_URL ?? '')
-  .trim()
-  .replace(/^['"]|['"]$/g, '');
-
-/** Pull one tag out of an item, unwrapping CDATA and decoding entities. */
-function field(item, tag) {
-  const m = item.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`));
-  if (!m) return '';
-  return decode(m[1].replace(/^<!\[CDATA\[/, '').replace(/\]\]>$/, '').trim());
-}
+/**
+ * Shelves to query, in priority order. A book is filed under the first
+ * one it appears on. The widget has no dates of its own, so its sort
+ * order is what puts each shelf in order.
+ */
+const SHELVES = [
+  { name: 'currently-reading', bucket: 'current', sort: 'date_added' },
+  { name: 'did-not-finish', bucket: 'abandoned', sort: 'date_added' },
+  { name: 'to-read', bucket: 'queue', sort: 'date_added' },
+  { name: 'read', bucket: 'finished', sort: 'date_read' },
+];
 
 function decode(s) {
   return s
@@ -50,122 +46,114 @@ function cleanTitle(t) {
   return t.replace(/\s*\([^)]*#[^)]*\)\s*$/, '').trim();
 }
 
-function parseDate(s) {
-  if (!s) return null;
-  const d = new Date(s);
-  return Number.isNaN(d.valueOf()) ? null : d.toISOString().slice(0, 10);
+/** The widget is a script that writes HTML; unwrap the string it holds. */
+function widgetHtml(script, shelf) {
+  const literal = script.match(/var widget_code = '([\s\S]*?)'\n/)?.[1];
+  const html = literal?.replace(/\\(u[0-9a-fA-F]{4}|[\s\S])/g, (_, c) => {
+    if (c === 'n') return '\n';
+    if (c.length > 1) return String.fromCharCode(parseInt(c.slice(1), 16));
+    return c;
+  });
+  if (!html?.includes('gr_custom_container')) {
+    throw new Error(`the ${shelf} widget has no shelf in it`);
+  }
+  return html;
 }
 
-/**
- * Shelves to query, in priority order. A book is filed under the first
- * one it appears on.
- *
- * These are queried individually rather than read from the #ALL# feed's
- * user_shelves field, which Goodreads does not reliably update: moving
- * a book to currently-reading shows up immediately on that shelf's own
- * feed while #ALL# still reports the old shelves. The per-shelf feeds
- * are the source of truth.
- */
-const SHELVES = [
-  { name: 'currently-reading', bucket: 'current' },
-  { name: 'did-not-finish', bucket: 'abandoned' },
-  { name: 'to-read', bucket: 'queue' },
-  { name: 'read', bucket: 'finished' },
-];
-
-async function fetchPage(url, shelf, page) {
-  const u = new URL(url);
-  u.searchParams.set('shelf', shelf);
-  u.searchParams.set('page', String(page));
-  u.searchParams.set('per_page', String(PER_PAGE));
+async function fetchShelf({ name, sort }) {
+  const u = new URL(`https://www.goodreads.com/review/custom_widget/${USER_ID}`);
+  u.searchParams.set('shelf', name);
+  u.searchParams.set('sort', sort);
+  u.searchParams.set('order', 'd');
+  u.searchParams.set('num_books', String(MAX_BOOKS));
+  // Goodreads caches a widget's books by widget_id, so each run needs a
+  // new one. Without it every shelf returns the same cached books.
+  u.searchParams.set('widget_id', `${name}-${Date.now()}`);
 
   const res = await fetch(u, {
     headers: { 'user-agent': 'moving-parts-site/1.0' },
   });
   if (!res.ok) throw new Error(`Goodreads returned HTTP ${res.status}`);
-  return res.text();
-}
 
-/** Every item on one shelf, following pagination. */
-async function fetchShelf(url, shelf) {
-  const items = [];
-  for (let page = 1; page <= MAX_PAGES; page++) {
-    const xml = await fetchPage(url, shelf, page);
-    const found = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
-    items.push(...found);
-    if (found.length < PER_PAGE) break;
+  const html = widgetHtml(await res.text(), name);
+  const blocks = html.split(/class="gr_custom_each_container[^"]*"/).slice(1);
+  const books = blocks.map((block) => toBook(block, name));
+  if (books.length >= MAX_BOOKS) {
+    console.warn(`The ${name} shelf may be cut off at ${MAX_BOOKS} books.`);
   }
-  return items;
+  return books;
 }
 
-function toBook(item) {
-  const readAt = parseDate(field(item, 'user_read_at'));
-  // Personal ratings are deliberately not published.
+/** One book from its widget block. Throws rather than guess at a field. */
+function toBook(block, shelf) {
+  const title = block.match(/<a title="([^"]*)"/)?.[1];
+  const review = block.match(/href="([^"]*\/review\/show\/[^"]*)"/)?.[1];
+  const cover = block.match(/<img[^>]*src="([^"]*gr-assets[^"]*\/books\/[^"]*)"/)?.[1];
+  const author = block.match(/\/author\/show\/[^"]*">([^<]*)</)?.[1];
+  if (!title || !review || !author) {
+    throw new Error(`could not read a book on the ${shelf} widget`);
+  }
+
+  // Only the cover carries the book's ID. Review pages now need a sign-in,
+  // so link to the book itself where the ID is known.
+  const id = cover?.match(/\/(\d+)(?:\.[^/]*)?$/)?.[1];
+  const reviewId = review.match(/\/review\/show\/(\d+)/)?.[1];
   return {
-    id: field(item, 'book_id'),
-    title: cleanTitle(field(item, 'title')),
-    author: field(item, 'author_name'),
-    link: field(item, 'link'),
-    cover: field(item, 'book_medium_image_url'),
-    readAt,
-    addedAt: parseDate(field(item, 'user_date_added')),
-    review: field(item, 'user_review'),
+    id: id ?? `review-${reviewId}`,
+    title: cleanTitle(decode(title)),
+    author: decode(author).replace(/\s+/g, ' ').trim(),
+    link: id ? `https://www.goodreads.com/book/show/${id}` : decode(review),
+    cover: cover ? cover.replace('_SY75_', '_SX98_') : '',
+    readAt: null,
+    addedAt: null,
+    review: '',
   };
 }
 
-async function main() {
-  if (!feedUrl) {
-    console.error(
-      'GOODREADS_RSS_URL is not set — keeping the existing src/data/reads.json.'
-    );
-    return;
-  }
-
-  // Fail early and legibly on a malformed URL rather than reporting a
-  // bare "Invalid URL" from deep inside fetch().
+async function readExisting() {
   try {
-    const u = new URL(feedUrl);
-    if (!/^https?:$/.test(u.protocol)) {
-      throw new Error(`unexpected protocol ${u.protocol}`);
-    }
-  } catch (err) {
-    throw new Error(
-      `GOODREADS_RSS_URL is not a usable URL (${err.message}). ` +
-        'Store it without surrounding quotes.'
-    );
+    return JSON.parse(await readFile(OUT, 'utf8'));
+  } catch {
+    return null;
   }
+}
 
+/** The widget has no dates or reviews, so keep the ones already on file. */
+function earlierDetails(existing) {
+  const lists = ['current', 'finished', 'queue', 'abandoned'];
+  const details = new Map();
+  for (const book of lists.flatMap((key) => existing?.[key] ?? [])) {
+    details.set(book.title, book);
+  }
+  return details;
+}
+
+async function main() {
+  const earlier = earlierDetails(await readExisting());
   const buckets = { current: [], finished: [], queue: [], abandoned: [] };
   const seen = new Set();
 
-  for (const { name, bucket } of SHELVES) {
-    for (const item of await fetchShelf(feedUrl, name)) {
-      const book = toBook(item);
-      if (seen.has(book.id)) continue; // first shelf wins
-      seen.add(book.id);
-      buckets[bucket].push(book);
+  for (const shelf of SHELVES) {
+    for (const book of await fetchShelf(shelf)) {
+      if (seen.has(book.title)) continue; // first shelf wins
+      seen.add(book.title);
+      const known = earlier.get(book.title);
+      buckets[shelf.bucket].push({
+        ...book,
+        readAt: known?.readAt ?? null,
+        addedAt: known?.addedAt ?? null,
+        review: known?.review ?? '',
+      });
     }
   }
 
-  // Anything on no status shelf at all — Goodreads omits the implicit
-  // "read" for some older entries — is treated as read.
-  for (const item of await fetchShelf(feedUrl, '#ALL#')) {
-    const book = toBook(item);
-    if (seen.has(book.id)) continue;
-    seen.add(book.id);
-    buckets.finished.push(book);
-  }
-
-  const newest = (a, b) => (b.readAt ?? '').localeCompare(a.readAt ?? '');
-  const added = (a, b) => (b.addedAt ?? '').localeCompare(a.addedAt ?? '');
+  // Four empty shelves means the widget changed, not that the books went.
+  if (seen.size === 0) throw new Error('every shelf came back empty');
 
   const data = {
     updated: new Date().toISOString(),
-    source: 'goodreads-rss',
-    current: buckets.current.sort(added),
-    finished: buckets.finished.sort(newest),
-    queue: buckets.queue.sort(added),
-    abandoned: buckets.abandoned.sort(added),
+    source: 'goodreads-widget',
+    ...buckets,
   };
 
   await writeFile(OUT, JSON.stringify(data, null, 2) + '\n');
@@ -180,6 +168,10 @@ async function main() {
 
 main().catch(async (err) => {
   console.error(`Goodreads fetch failed: ${err.message}`);
+  // Show on the deploy's summary page; the run itself still passes.
+  if (process.env.GITHUB_ACTIONS) {
+    console.log(`::warning title=Goodreads sync failed::${err.message}`);
+  }
   try {
     await readFile(OUT);
     console.error('Keeping the committed src/data/reads.json.');

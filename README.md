@@ -64,36 +64,33 @@ The index groups them: in-progress first, finished below.
 
 ## Reads
 
-`src/data/reads.json` is generated from the Goodreads RSS feed and
-committed. Goodreads retired its API in 2020, but the per-user RSS feeds
-still work.
+`src/data/reads.json` is generated from Goodreads and committed. Goodreads
+retired its API in 2020 and its RSS feeds in October 2026, so the sync
+reads the public shelf widget it offers for embedding on other sites.
 
 ```sh
-cp .env.example .env   # paste your feed URL
 npm run sync:reads
 ```
 
-The feed URL carries a private key, so it lives in `.env` locally and in
-the `GOODREADS_RSS_URL` repository secret on CI — never in the repo.
+The widget needs no key, only the public user ID in
+`scripts/fetch-reads.mjs`.
 
-A `.env` file wants the value quoted; GitHub's secret field does not,
-and stores whatever is typed. The script trims stray quotes and
-whitespace and checks the URL parses before fetching, so a value pasted
-from one into the other still works and says so plainly if it cannot.
-
-CI re-syncs on every deploy and on a daily cron. If Goodreads is
-unreachable the script logs it, exits 0 and leaves the committed JSON in
-place, so an outage there cannot fail a deploy.
+CI re-syncs on every deploy and on a daily cron. If Goodreads can't be
+read the script logs it, exits 0 and leaves the committed JSON in place,
+so an outage there cannot fail a deploy. On CI it also raises a warning
+on the run, because a passing deploy can otherwise hide a broken sync
+for days.
 
 Each shelf is fetched separately — `currently-reading`, `did-not-finish`,
 `to-read`, `read` — and a book is filed under the first it appears on.
-A final `#ALL#` pass catches anything on no status shelf, which
-Goodreads treats as read.
+Each request needs a new `widget_id`: Goodreads caches a widget's books
+by that ID, and without it every shelf returns the same books.
 
-This is deliberate. The `#ALL#` feed's `user_shelves` field goes stale:
-move a book to currently-reading and its own shelf feed updates at
-once, while `#ALL#` keeps reporting the old shelves for some time. The
-per-shelf feeds are the source of truth.
+The widget has no dates, so the shelf order comes from its sort, and read
+years already in the JSON are kept. A book finished from now on has no
+year. Goodreads changing the widget's HTML will stop the sync, so the
+script fails on anything it can't read rather than writing a partial
+shelf.
 
 If a book lands in the wrong place, fix its shelves on Goodreads and
 re-sync.
