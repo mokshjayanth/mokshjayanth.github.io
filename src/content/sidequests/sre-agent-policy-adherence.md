@@ -1,9 +1,9 @@
 ---
 title: How well do agents follow written rules?
-description: A pre-registered study of whether AI agents fixing live Kubernetes incidents follow the operational policy they are given.
+description: An experiment on whether AI agents follow written rules while fixing faults in a production-like system.
 started: 2026-09-13
 status: active
-stack: ['Python', 'AIOpsLab', 'Kubernetes (kind)']
+stack: ['Python', 'AI', 'Microsoft', 'AIOpsLab']
 draft: false
 ---
 

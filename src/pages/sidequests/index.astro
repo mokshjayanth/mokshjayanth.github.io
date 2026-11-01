@@ -22,9 +22,8 @@ const groups = [
 
 const year = (d?: Date) => (d ? String(d.getFullYear()) : null);
 
-const span = (started: Date, finished?: Date, status?: string) => {
+const span = (started: Date, finished?: Date) => {
   const from = year(started);
-  if (status !== 'done') return `since ${from}`;
   const to = year(finished);
   return !to || to === from ? from : `${from}–${to}`;
 };
@@ -52,7 +51,9 @@ const span = (started: Date, finished?: Date, status?: string) => {
                 )}
               </div>
               <p class="meta">
-                {span(quest.data.started, quest.data.finished, quest.data.status)}
+                {quest.data.status === 'done' && (
+                  <span class="when">{span(quest.data.started, quest.data.finished)}</span>
+                )}
                 {quest.data.stack.length > 0 && (
                   <span class="stack">{quest.data.stack.join(' · ')}</span>
                 )}
@@ -116,7 +117,7 @@ const span = (started: Date, finished?: Date, status?: string) => {
       color: var(--text-muted);
     }
 
-    .stack::before {
+    .when + .stack::before {
       content: '· ';
     }
 
